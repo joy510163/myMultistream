@@ -58,22 +58,29 @@
 @keyframes notice-countdown{from{transform:scaleX(1)}to{transform:scaleX(0)}}
 @media(prefers-reduced-motion:reduce){.notice-slot .notice-progress{animation:none;display:none}}
 
-/* Hotfix: force a real entry animation even when React batches visibility state.
-   Exit remains handled by the existing transitions. */
-@keyframes msh-toast-enter {
-  from { opacity:0; transform:translateY(-12px); grid-template-rows:0fr; margin-top:0; }
-  to { opacity:1; transform:translateY(0); grid-template-rows:1fr; margin-top:13px; }
+
+/* Phase-based toast animation: mounting always enters; exiting always leaves.
+   React remounts by notice.id so repeated notifications replay the entrance. */
+.notice-slot {
+  transition:none;
+  grid-template-rows:1fr;
+  opacity:1;
+  transform:none;
+  margin-top:13px;
+  pointer-events:auto;
 }
-@keyframes msh-toast-content-enter {
-  from { opacity:0; transform:translateY(-5px); }
-  to { opacity:1; transform:translateY(0); }
+.notice-slot>.alert {padding:10px 13px;transition:none}
+.notice-slot.is-visible {animation:msh-toast-in .42s cubic-bezier(.2,.75,.2,1) both}
+.notice-slot.is-leaving {pointer-events:none;animation:msh-toast-out .4s ease-in both}
+@keyframes msh-toast-in {
+  from {opacity:0;transform:translateY(-10px);grid-template-rows:0fr;margin-top:0}
+  to {opacity:1;transform:translateY(0);grid-template-rows:1fr;margin-top:13px}
 }
-.notice-slot.is-visible {
-  animation:msh-toast-enter .42s cubic-bezier(.2,.75,.2,1) both;
-}
-.notice-slot.is-visible > .alert {
-  animation:msh-toast-content-enter .34s ease-out both;
+@keyframes msh-toast-out {
+  from {opacity:1;transform:translateY(0);grid-template-rows:1fr;margin-top:13px}
+  to {opacity:0;transform:translateY(-10px);grid-template-rows:0fr;margin-top:0}
 }
 @media(prefers-reduced-motion:reduce){
-  .notice-slot.is-visible,.notice-slot.is-visible > .alert {animation:none}
+  .notice-slot.is-visible,.notice-slot.is-leaving{animation:none}
+  .notice-slot.is-leaving{display:none;margin:0}
 }

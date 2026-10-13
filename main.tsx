@@ -1,6 +1,6 @@
 import React from 'react';
 import {createRoot} from 'react-dom/client';
-import {Plus,Share2,MessageSquare,Volume2,VolumeX,MonitorPlay,Trash2,ArrowUpRight,Pin,ChevronDown,ChevronUp,Copy,X,Check,Settings,ExternalLink,PanelRightClose,PanelRightOpen,RotateCcw,Play,AlertCircle,CheckCircle2,AlertTriangle,GripVertical,Sun,Moon,Info} from 'lucide-react';
+import {Plus,Share2,MessageSquare,Volume2,VolumeX,MonitorPlay,Trash2,ArrowUpRight,Pin,ChevronDown,ChevronUp,Copy,X,Check,Settings,ExternalLink,PanelRightClose,PanelRightOpen,RotateCcw,Play,AlertCircle,AlertTriangle,GripVertical,Sun,Moon,Info} from 'lucide-react';
 import {type Layout,parseStream,loadSaved,save,encodeLayout,decodeLayout,mergeLayout,streamSrc,chatSrc} from './core';
 import './style.css';
 function App(){
@@ -14,7 +14,7 @@ function App(){
  type NoticeKind = 'success' | 'error' | 'warning' | 'info';
  type Notice = {id:number; message:string; kind:NoticeKind};
  const [notice,setNotice]=React.useState<Notice|null>(null);
- const [noticeVisible,setNoticeVisible]=React.useState(false);
+ const [noticeVisible,setNoticeVisible]=React.useState(true);
  const [noticePaused,setNoticePaused]=React.useState(false);
  const noticeTimer=React.useRef<ReturnType<typeof setTimeout>|null>(null);
  const noticeExitTimer=React.useRef<ReturnType<typeof setTimeout>|null>(null);
@@ -43,7 +43,7 @@ function App(){
   clearNoticeTimers();
   noticeRemaining.current=5000;
   setNoticePaused(false);
-  setNoticeVisible(false);
+  setNoticeVisible(true);
   setNotice({id:++noticeNextId.current,message,kind});
  }
  function dismissNotice(){
@@ -57,14 +57,6 @@ function App(){
   setNoticePaused(true);
  }
  function resumeNotice(){if(noticePaused)setNoticePaused(false);}
- React.useEffect(()=>{
-  if(!notice)return;
-  let secondFrame=0;
-  const firstFrame=requestAnimationFrame(()=>{
-   secondFrame=requestAnimationFrame(()=>setNoticeVisible(true));
-  });
-  return ()=>{cancelAnimationFrame(firstFrame);cancelAnimationFrame(secondFrame);};
- },[notice?.id]);
  React.useEffect(()=>{
   if(!notice||!noticeVisible||noticePaused)return;
   noticeStarted.current=Date.now();
@@ -119,7 +111,7 @@ function App(){
   <main className="workspace">
    <section className="intro"><div><p className="eyebrow">STREAM WORKSPACE <span className="accent-line"/></p><h1>你的直播，一眼掌握。</h1><p className="sub">集中觀看 Twitch 與 YouTube，讓精彩不漏接。</p></div><div className="stats"><div><strong>{active.streams.length.toString().padStart(2,'0')}</strong><small>目前直播來源</small></div></div></section>
    <section className="add-panel"><div className="add-icon"><Plus size={21}/></div><div className="add-field"><label htmlFor="stream-url">新增直播來源</label><input id="stream-url" placeholder="貼上 Twitch 或 YouTube 直播網址…" value={addInput} onChange={e=>setAddInput(e.target.value)} onKeyDown={e=>{if(e.key==='Enter')add();}}/></div><button className="btn primary add-button" onClick={add}><Plus size={16}/> 加入頻道</button></section>
-   {notice&&<div className={'notice-slot '+(noticeVisible?'is-visible':'is-leaving')+(noticePaused?' is-paused':'')} onPointerEnter={pauseNotice} onPointerLeave={resumeNotice} onFocusCapture={pauseNotice} onBlurCapture={e=>{if(!e.currentTarget.contains(e.relatedTarget as Node|null))resumeNotice();}} role={notice.kind==='error'?'alert':'status'} aria-live={notice.kind==='error'?'assertive':'polite'}><div className={'alert '+notice.kind}>{notice.kind==='success'?<Check size={16}/>:notice.kind==='error'?<AlertCircle size={16}/>:notice.kind==='warning'?<AlertTriangle size={16}/>:<Info size={16}/>}<span>{notice.message}</span><button aria-label="關閉提示" onClick={dismissNotice}><X size={14}/></button></div><div key={notice.id} className="notice-progress" aria-hidden="true"/></div>}
+   {notice&&<div key={notice.id} className={'notice-slot '+(noticeVisible?'is-visible':'is-leaving')+(noticePaused?' is-paused':'')} onPointerEnter={pauseNotice} onPointerLeave={resumeNotice} onFocusCapture={pauseNotice} onBlurCapture={e=>{if(!e.currentTarget.contains(e.relatedTarget as Node|null))resumeNotice();}} role={notice.kind==='error'?'alert':'status'} aria-live={notice.kind==='error'?'assertive':'polite'}><div className={'alert '+notice.kind}>{notice.kind==='success'?<Check size={16}/>:notice.kind==='error'?<AlertCircle size={16}/>:notice.kind==='warning'?<AlertTriangle size={16}/>:<Info size={16}/>}<span>{notice.message}</span><button aria-label="關閉提示" onClick={dismissNotice}><X size={14}/></button></div><div key={notice.id} className="notice-progress" aria-hidden="true"/></div>}
    {temporary&&<div className="temporary-banner"><Pin size={16}/> 目前為暫時分享觀看模式，新增或移除不會改動你的個人清單。<button onClick={backPersonal}>返回我的清單</button></div>}
    <div className="section-title"><div><span className="section-kicker">01 / LIVE VIEW</span><h2>觀看控制台</h2></div><div className="toolbar"><button className="ghost" onClick={()=>setLiveMonitors(v=>!v)}>{liveMonitors?'關閉多台同步播放':'啟用多台同步播放'}</button><button className="ghost" onClick={()=>setMuted(v=>!v)} title="設定重新載入播放器時的預設靜音狀態"><span>{muted?<VolumeX size={16}/>:<Volume2 size={16}/>}</span>{muted?'新播放器預設靜音':'新播放器預設有聲'}</button><button className="ghost" onClick={()=>setShowChat(v=>!v)}>{showChat?<PanelRightClose size={16}/>:<PanelRightOpen size={16}/>} {showChat?'隱藏聊天室':'顯示聊天室'}</button></div></div>
    <section ref={viewRef} style={{'--monitor-width':`${panelWidth}px`} as React.CSSProperties} className={'view-grid '+(dragging?' resizing ':'')+(showChat?'':'without-chat')+(liveMonitors?' with-live-monitors':'')}>
