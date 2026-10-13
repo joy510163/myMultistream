@@ -1,16 +1,17 @@
 # MultiStream Hub
 
-**最新版本：V1.1.1** · Twitch × YouTube 多直播觀看中心 · React + TypeScript + Vite
+**最新版本：V1.1.2** · Twitch × YouTube 多直播觀看中心 · React + TypeScript + Vite
 
 🌐 **[立即使用 MultiStream Hub](https://joy510163.github.io/myMultistream/)** · [完整更新紀錄](CHANGELOG.md)
 
-## ✨ V1.1.1 最新更新
+## ✨ V1.1.2 最新更新
 
-- YouTube 聊天室工具列新增 **深色／淺色切換**，在「顯示設定」中也可以調整，偏好保存在瀏覽器 `localStorage`。
-- YouTube 主題切換是透過 `dark_theme=1/0` 嵌入網址參數嘗試實現，**不保證 YouTube 會套用**；外部 iframe 的內部文字與背景無法由本站 CSS 強制修改。
-- 設定面板新增 **目前版本**、GitHub 專案及 CHANGELOG 連結。
-- 更新 README 為最新版本優先、建立 CHANGELOG，並移除未使用的 `Columns3` 匯入。
-- **維持 V1.1 功能與 Hash 分享格式相容**；本次不包含短網址／資料庫／自訂網域。
+- YouTube 聊天室主題切換按鈕與頻道選擇器在同一列，位於選單左側。
+- 聊天室頻道選單支援點擊外部關閉及 Esc 關閉／鍵盤焦點返回。
+- 工作區頂部統計統一為「目前直播來源」，避免重複資訊。
+- 成功提示 5 秒自動收合；淡入、淡出及高度展開／收合會帶動下方區塊平滑位移。仍可手動關閉。
+- README／CHANGELOG 採最新版本優先，版本資訊同步為 V1.1.2。
+- 沿用 V1.1.1 播放器、聊天室主題記憶、個人清單、Hash 分享與三種匯入模式。
 
 ## 已支援功能
 
@@ -55,4 +56,4 @@ npm run build
 
 ## 歷史版本
 
-**V1.1.1 → V1.1.0 → V1.0.0**。詳細修改請見 [CHANGELOG.md](CHANGELOG.md)，最新版本置頂。
+**V1.1.2 → V1.1.0 → V1.0.0**。詳細修改請見 [CHANGELOG.md](CHANGELOG.md)，最新版本置頂。
