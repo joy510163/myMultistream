@@ -64,7 +64,7 @@ export function streamSrc(s:Stream,muted:boolean):string {
  }
  const u=new URL(`https://www.youtube.com/embed/${s.id}`);u.searchParams.set('autoplay','1');u.searchParams.set('mute',muted?'1':'0');u.searchParams.set('playsinline','1');return u.href;
 }
-export function chatSrc(s:Stream):string {
+export function chatSrc(s:Stream, youtubeTheme:'dark'|'light'='dark'):string {
  if(s.platform==='twitch')return `https://www.twitch.tv/embed/${s.id}/chat?parent=${encodeURIComponent(window.location.hostname)}&darkpopout`;
- return `https://www.youtube.com/live_chat?v=${encodeURIComponent(s.id)}&embed_domain=${encodeURIComponent(window.location.hostname)}`;
+ return `https://www.youtube.com/live_chat?v=${encodeURIComponent(s.id)}&embed_domain=${encodeURIComponent(window.location.hostname)}&dark_theme=${youtubeTheme==='dark'?'1':'0'}`;
 }

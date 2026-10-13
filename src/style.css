@@ -15,3 +15,10 @@
 .view-grid .monitor-preview{height:auto;aspect-ratio:16/9}
 @media(max-width:1180px){.view-grid,.view-grid.with-live-monitors{grid-template-columns:minmax(0,1fr);gap:16px}.resize-handle{display:none}.view-grid .monitor-list{grid-template-columns:repeat(auto-fit,minmax(min(100%,400px),1fr));max-height:unset}.monitor-column{overflow:hidden}}
 @media(max-width:490px){.view-grid .monitor-list{grid-template-columns:minmax(0,1fr)}.with-live-monitors .monitor-card{min-width:0!important}.with-live-monitors .monitor-column{overflow-x:visible}.with-live-monitors .monitor-live{min-width:400px}.with-live-monitors .monitor-card{overflow-x:auto}}
+
+/* V1.1.1: YouTube chat controls and version details */
+.chat-theme-toggle{display:inline-flex;align-items:center;gap:5px;white-space:nowrap;padding:7px 9px;border:1px solid rgba(168,139,245,.25);border-radius:8px;background:rgba(139,92,246,.08);color:#c8b5ff;cursor:pointer;font-size:12px}
+.chat-theme-toggle:hover{background:rgba(139,92,246,.2)}
+.version-info{display:flex;align-items:center;gap:9px;margin:18px 0 10px;padding:12px;background:rgba(139,92,246,.09);border-radius:9px;font-size:13px;color:#d4c9f8}
+.version-info a{color:#c2aaff;text-decoration:underline}
+@media(max-width:650px){.chat-theme-toggle span{display:none}.chat-theme-toggle{padding:7px}}
