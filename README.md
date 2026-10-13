@@ -48,3 +48,18 @@ npm run build
 ```
 
 手動測試：加入 Twitch / YouTube → 重新整理確認保存 → 分享網址在無痕視窗開啟 → 暫時開啟 → 合併（去重）→ 取代（確認）→ 無效 Hash 錯誤提示。
+
+## V1.1 — 可拖曳多直播網格
+
+- 保留 V1.0 原有的 Twitch / YouTube、聊天室、LocalStorage、Hash 分享及三種匯入方式。
+- 桌面寬視窗（約 1180px 以上）：主播放器與監看區之間新增可拖曳分隔線，亦可使用方向鍵微調；寬度自動保存在同一瀏覽器的 LocalStorage。
+- 監看卡片依可用寬度自動排列成網格。按「啟用多台同步播放」後，監看卡片切換成官方 iframe 播放器；預設關閉，避免開站瞬間產生過大頻寬負擔。
+- Twitch 監看 iframe 保持至少 400 × 300px。較小視窗自動改成上下排列；手機尺寸可能需要橫向滑動 Twitch 播放器。
+- 監看直播預設靜音；各平台播放器能否自動播放仍受瀏覽器與直播平台限制。
+- 分享資料格式仍為 `version:1`，舊分享連結可以沿用，布局寬度屬於個人偏好而不分享。
+
+### 在既有 GitHub 儲存庫更新
+
+建議使用 GitHub 網頁編輯器 `https://github.dev/<帳號>/<儲存庫>`，依照本新版將以下檔案內容覆蓋並 Commit + Push：`src/main.tsx`、`src/style.css`、`package.json` 和 `README.md`。**不要刪掉原儲存庫或覆蓋 `.github/workflows/deploy.yml`**。Github Actions 會在 main 分支推送後再次部署。
+
+注意：在產生此版的環境中，無法連線到 npm registry，因此只完成了 TypeScript/JSX 語法轉換檢查；完整套件安裝、正式建置與瀏覽器實測仍待 GitHub Actions 驗證。

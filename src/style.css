@@ -3,3 +3,15 @@
 
 /* Multi-player monitor mode preserves Twitch minimum embed size. */
 .view-grid.with-live-monitors{grid-template-columns:minmax(420px,1fr) 438px}.with-live-monitors .monitor-column{padding:15px}.monitor-live{width:100%;height:310px;background:#0b0d14}.monitor-live iframe{display:block;border:0;width:100%;height:100%}.with-live-monitors .monitor-list{max-height:1100px}.with-live-monitors .monitor-meta{min-height:42px}@media(max-width:1240px){.view-grid.with-live-monitors{grid-template-columns:minmax(0,1fr)}.with-live-monitors .monitor-list{grid-template-columns:repeat(auto-fit,minmax(400px,1fr));max-height:none}.with-live-monitors .monitor-live{height:310px}}@media(max-width:460px){.with-live-monitors .monitor-list{display:block}.with-live-monitors .monitor-card{margin-bottom:12px}.with-live-monitors .monitor-column{overflow-x:auto}.with-live-monitors .monitor-card{min-width:400px}}
+
+/* V1.1 – resizable focus layout and true grid monitor mode */
+.view-grid,.view-grid.with-live-monitors{grid-template-columns:minmax(420px,1fr) 12px minmax(400px,var(--monitor-width,440px));gap:8px;align-items:stretch}
+.resize-handle{display:flex;align-items:center;justify-content:center;align-self:stretch;cursor:col-resize;color:#9683cd;border-radius:9px;touch-action:none;user-select:none;min-height:120px;background:linear-gradient(90deg,transparent 38%,#313047 42%,#313047 58%,transparent 62%)}
+.resize-handle:hover,.resize-handle:focus-visible,.resizing .resize-handle{background:#4f3e78;outline:0;color:white}
+.resizing{cursor:col-resize;user-select:none}.resizing:after{content:"";position:fixed;inset:0;z-index:50;cursor:col-resize;background:transparent}
+.monitor-column{min-width:0}.view-grid .monitor-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,400px),1fr));max-height:1100px;gap:12px;overflow:auto}
+.with-live-monitors .monitor-card{min-width:0}.with-live-monitors .monitor-live{height:auto;aspect-ratio:4/3;min-height:300px}
+.with-live-monitors .monitor-live iframe{min-height:300px}
+.view-grid .monitor-preview{height:auto;aspect-ratio:16/9}
+@media(max-width:1180px){.view-grid,.view-grid.with-live-monitors{grid-template-columns:minmax(0,1fr);gap:16px}.resize-handle{display:none}.view-grid .monitor-list{grid-template-columns:repeat(auto-fit,minmax(min(100%,400px),1fr));max-height:unset}.monitor-column{overflow:hidden}}
+@media(max-width:490px){.view-grid .monitor-list{grid-template-columns:minmax(0,1fr)}.with-live-monitors .monitor-card{min-width:0!important}.with-live-monitors .monitor-column{overflow-x:visible}.with-live-monitors .monitor-live{min-width:400px}.with-live-monitors .monitor-card{overflow-x:auto}}
