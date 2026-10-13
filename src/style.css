@@ -42,3 +42,18 @@
 .chat-header{position:relative;z-index:3;border-radius:13px 13px 0 0}
 .chat-content{position:relative;z-index:1}
 .chat-menu{z-index:5}
+
+/* V1.1.3: consistent animated notices for all outcomes */
+.alert.warning{color:#ffe0a3;background:#59451c77}
+.alert.info{color:#c4dbff;background:#24446d66}
+.notice-slot{position:relative;border-radius:9px;overflow:hidden}
+.notice-slot>.alert{margin:0}
+.notice-slot .notice-progress{position:absolute;left:0;bottom:0;height:2px;width:100%;background:currentColor;opacity:.5;transform-origin:left center;animation:notice-countdown 5s linear both}
+.notice-slot:has(.alert.success){color:#a8f5c3}
+.notice-slot:has(.alert.error){color:#ffc4cf}
+.notice-slot:has(.alert.warning){color:#ffe0a3}
+.notice-slot:has(.alert.info){color:#c4dbff}
+.notice-slot.is-paused .notice-progress{animation-play-state:paused}
+.notice-slot .alert>svg{flex-shrink:0}
+@keyframes notice-countdown{from{transform:scaleX(1)}to{transform:scaleX(0)}}
+@media(prefers-reduced-motion:reduce){.notice-slot .notice-progress{animation:none;display:none}}

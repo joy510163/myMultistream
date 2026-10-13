@@ -1,6 +1,6 @@
 import React from 'react';
 import {createRoot} from 'react-dom/client';
-import {Plus,Share2,MessageSquare,Volume2,VolumeX,MonitorPlay,Trash2,ArrowUpRight,Pin,ChevronDown,ChevronUp,Copy,X,Check,Settings,ExternalLink,PanelRightClose,PanelRightOpen,RotateCcw,Play,AlertCircle,GripVertical,Sun,Moon,Info} from 'lucide-react';
+import {Plus,Share2,MessageSquare,Volume2,VolumeX,MonitorPlay,Trash2,ArrowUpRight,Pin,ChevronDown,ChevronUp,Copy,X,Check,Settings,ExternalLink,PanelRightClose,PanelRightOpen,RotateCcw,Play,AlertCircle,CheckCircle2,AlertTriangle,GripVertical,Sun,Moon,Info} from 'lucide-react';
 import {type Layout,parseStream,loadSaved,save,encodeLayout,decodeLayout,mergeLayout,streamSrc,chatSrc} from './core';
 import './style.css';
 function App(){
@@ -11,12 +11,16 @@ function App(){
  const [importError,setImportError]=React.useState('');
  const [replaceConfirm,setReplaceConfirm]=React.useState(false);
  const [addInput,setAddInput]=React.useState('');
- const [error,setError]=React.useState('');
- const [notice,setNotice]=React.useState('');
+ type NoticeKind = 'success' | 'error' | 'warning' | 'info';
+ type Notice = {id:number; message:string; kind:NoticeKind};
+ const [notice,setNotice]=React.useState<Notice|null>(null);
  const [noticeVisible,setNoticeVisible]=React.useState(false);
+ const [noticePaused,setNoticePaused]=React.useState(false);
  const noticeTimer=React.useRef<ReturnType<typeof setTimeout>|null>(null);
  const noticeExitTimer=React.useRef<ReturnType<typeof setTimeout>|null>(null);
- const [noticeSerial,setNoticeSerial]=React.useState(0);
+ const noticeRemaining=React.useRef(5000);
+ const noticeStarted=React.useRef(0);
+ const noticeNextId=React.useRef(0);
  const chatPickerRef=React.useRef<HTMLDivElement|null>(null);
  const chatTriggerRef=React.useRef<HTMLButtonElement|null>(null);
  const [shareOpen,setShareOpen]=React.useState(false);
@@ -31,17 +35,40 @@ function App(){
  const [panelWidth,setPanelWidth]=React.useState(()=>{const v=Number(localStorage.getItem('msh:monitorWidth:v1'));return Number.isFinite(v)&&v>=400&&v<=1200?v:440;});
  const [dragging,setDragging]=React.useState(false);
  const viewRef=React.useRef<HTMLElement|null>(null);
- React.useEffect(()=>{
-  if(!notice)return;
-  if(noticeExitTimer.current){clearTimeout(noticeExitTimer.current);noticeExitTimer.current=null;}
-  if(noticeTimer.current)clearTimeout(noticeTimer.current);
+ function clearNoticeTimers(){
+  if(noticeTimer.current!==null){clearTimeout(noticeTimer.current);noticeTimer.current=null;}
+  if(noticeExitTimer.current!==null){clearTimeout(noticeExitTimer.current);noticeExitTimer.current=null;}
+ }
+ function notify(message:string,kind:NoticeKind='success'){
+  clearNoticeTimers();
+  noticeRemaining.current=5000;
+  setNoticePaused(false);
+  setNotice({id:++noticeNextId.current,message,kind});
   setNoticeVisible(true);
-  noticeTimer.current=setTimeout(()=>setNoticeVisible(false),5000);
-  return ()=>{if(noticeTimer.current)clearTimeout(noticeTimer.current);};
- },[notice,noticeSerial]);
- function dismissNotice(){if(noticeTimer.current)clearTimeout(noticeTimer.current);setNoticeVisible(false);}
- function notify(message:string){setNotice(message);setNoticeSerial(i=>i+1);}
- React.useEffect(()=>{if(!notice||noticeVisible)return;noticeExitTimer.current=setTimeout(()=>setNotice(''),420);return ()=>{if(noticeExitTimer.current)clearTimeout(noticeExitTimer.current);};},[notice,noticeVisible]);
+ }
+ function dismissNotice(){
+  if(noticeTimer.current!==null){clearTimeout(noticeTimer.current);noticeTimer.current=null;}
+  setNoticeVisible(false);
+ }
+ function pauseNotice(){
+  if(!notice||!noticeVisible||noticePaused)return;
+  if(noticeTimer.current!==null){clearTimeout(noticeTimer.current);noticeTimer.current=null;}
+  noticeRemaining.current=Math.max(0,noticeRemaining.current-(Date.now()-noticeStarted.current));
+  setNoticePaused(true);
+ }
+ function resumeNotice(){if(noticePaused)setNoticePaused(false);}
+ React.useEffect(()=>{
+  if(!notice||!noticeVisible||noticePaused)return;
+  noticeStarted.current=Date.now();
+  noticeTimer.current=setTimeout(()=>{noticeTimer.current=null;setNoticeVisible(false);},noticeRemaining.current);
+  return ()=>{if(noticeTimer.current!==null){clearTimeout(noticeTimer.current);noticeTimer.current=null;}};
+ },[notice?.id,noticeVisible,noticePaused]);
+ React.useEffect(()=>{
+  if(!notice||noticeVisible)return;
+  noticeExitTimer.current=setTimeout(()=>{setNotice(null);noticeExitTimer.current=null;},440);
+  return ()=>{if(noticeExitTimer.current!==null){clearTimeout(noticeExitTimer.current);noticeExitTimer.current=null;}};
+ },[notice?.id,noticeVisible]);
+ React.useEffect(()=>()=>clearNoticeTimers(),[]);
  React.useEffect(()=>{
   if(!chatSelectionOpen)return;
   const onPointerDown=(event:PointerEvent)=>{if(!chatPickerRef.current?.contains(event.target as Node))setChatSelectionOpen(false);};
@@ -71,21 +98,20 @@ function App(){
   setIncoming(null);setReplaceConfirm(false);
  }
  function backPersonal(){setTemporary(false);setActive(personal);clearHash();notify('已返回個人清單');}
- function add(){setError('');try{const item=parseStream(addInput);if(active.streams.some(x=>x.key===item.key))throw Error('這台直播已經在清單內囉');if(active.streams.length>=64)throw Error('目前最多儲存 64 台直播');apply({...active,streams:[...active.streams,item],main:active.main??item.key,chat:active.chat??item.key});setAddInput('');notify(`已加入 ${item.label}`);}catch(e){setError((e as Error).message);}}
+ function add(){try{const item=parseStream(addInput);if(active.streams.some(x=>x.key===item.key))throw Error('這台直播已經在清單內囉');if(active.streams.length>=64)throw Error('目前最多儲存 64 台直播');apply({...active,streams:[...active.streams,item],main:active.main??item.key,chat:active.chat??item.key});setAddInput('');notify(`已加入 ${item.label}`);}catch(e){const message=(e as Error).message;notify(message,message.includes('已經在清單')?'warning':'error');}}
  function remove(key:string){const streams=active.streams.filter(x=>x.key!==key);apply({...active,streams,main:active.main===key?streams[0]?.key??null:active.main,chat:active.chat===key?streams[0]?.key??null:active.chat});}
  const main=active.streams.find(s=>s.key===active.main)||active.streams[0];
  const chat=active.streams.find(s=>s.key===active.chat)||main;
  const others=active.streams.filter(s=>s.key!==main?.key);
  const displayed=showAll?others:others.slice(0,Math.max(0,limit-1));
  const shareUrl=location.origin+location.pathname+location.search+'#s='+encodeLayout(active);
- async function copyShare(){try{await navigator.clipboard.writeText(shareUrl);notify('分享網址已複製！');}catch{notify('無法自動複製，請手動選取網址');}}
+ async function copyShare(){try{await navigator.clipboard.writeText(shareUrl);notify('分享網址已複製！');}catch{notify('無法自動複製，請手動選取網址','error');}}
  return <div className="app">
   <header className="topbar"><div className="brand"><span className="brand-mark"><MonitorPlay size={21}/></span><div><strong>MultiStream <span>Hub</span></strong><small>YOUR LIVE CONTROL ROOM</small></div></div><div className="top-actions"><span className="live-counter"><span className="pulse"/>{active.streams.length} 個頻道</span>{temporary&&<button className="ghost small" onClick={backPersonal}><RotateCcw size={15}/> 返回個人清單</button>}<button className="btn primary" onClick={()=>setShareOpen(true)}><Share2 size={16}/> <span>分享組合</span></button><button className="icon-button" title="偏好設定" onClick={()=>setSettings(true)}><Settings size={19}/></button></div></header>
   <main className="workspace">
    <section className="intro"><div><p className="eyebrow">STREAM WORKSPACE <span className="accent-line"/></p><h1>你的直播，一眼掌握。</h1><p className="sub">集中觀看 Twitch 與 YouTube，讓精彩不漏接。</p></div><div className="stats"><div><strong>{active.streams.length.toString().padStart(2,'0')}</strong><small>目前直播來源</small></div></div></section>
    <section className="add-panel"><div className="add-icon"><Plus size={21}/></div><div className="add-field"><label htmlFor="stream-url">新增直播來源</label><input id="stream-url" placeholder="貼上 Twitch 或 YouTube 直播網址…" value={addInput} onChange={e=>setAddInput(e.target.value)} onKeyDown={e=>{if(e.key==='Enter')add();}}/></div><button className="btn primary add-button" onClick={add}><Plus size={16}/> 加入頻道</button></section>
-   {error&&<div className="alert error"><AlertCircle size={16}/>{error}<button onClick={()=>setError('')}><X size={14}/></button></div>}
-   {notice&&<div className={'notice-slot '+(noticeVisible?'is-visible':'is-leaving')} role="status" aria-live="polite"><div className="alert success"><Check size={16}/><span>{notice}</span><button aria-label="關閉提示" onClick={dismissNotice}><X size={14}/></button></div></div>}
+   {notice&&<div className={'notice-slot '+(noticeVisible?'is-visible':'is-leaving')+(noticePaused?' is-paused':'')} onPointerEnter={pauseNotice} onPointerLeave={resumeNotice} onFocusCapture={pauseNotice} onBlurCapture={e=>{if(!e.currentTarget.contains(e.relatedTarget as Node|null))resumeNotice();}} role={notice.kind==='error'?'alert':'status'} aria-live={notice.kind==='error'?'assertive':'polite'}><div className={'alert '+notice.kind}>{notice.kind==='success'?<Check size={16}/>:notice.kind==='error'?<AlertCircle size={16}/>:notice.kind==='warning'?<AlertTriangle size={16}/>:<Info size={16}/>}<span>{notice.message}</span><button aria-label="關閉提示" onClick={dismissNotice}><X size={14}/></button></div><div key={notice.id} className="notice-progress" aria-hidden="true"/></div>}
    {temporary&&<div className="temporary-banner"><Pin size={16}/> 目前為暫時分享觀看模式，新增或移除不會改動你的個人清單。<button onClick={backPersonal}>返回我的清單</button></div>}
    <div className="section-title"><div><span className="section-kicker">01 / LIVE VIEW</span><h2>觀看控制台</h2></div><div className="toolbar"><button className="ghost" onClick={()=>setLiveMonitors(v=>!v)}>{liveMonitors?'關閉多台同步播放':'啟用多台同步播放'}</button><button className="ghost" onClick={()=>setMuted(v=>!v)} title="設定重新載入播放器時的預設靜音狀態"><span>{muted?<VolumeX size={16}/>:<Volume2 size={16}/>}</span>{muted?'新播放器預設靜音':'新播放器預設有聲'}</button><button className="ghost" onClick={()=>setShowChat(v=>!v)}>{showChat?<PanelRightClose size={16}/>:<PanelRightOpen size={16}/>} {showChat?'隱藏聊天室':'顯示聊天室'}</button></div></div>
    <section ref={viewRef} style={{'--monitor-width':`${panelWidth}px`} as React.CSSProperties} className={'view-grid '+(dragging?' resizing ':'')+(showChat?'':'without-chat')+(liveMonitors?' with-live-monitors':'')}>
@@ -94,11 +120,11 @@ function App(){
     <div className="resize-handle" role="separator" aria-label="拖曳調整主畫面與監看區寬度" aria-orientation="vertical" tabIndex={0} onPointerDown={e=>{if(e.button!==0)return;e.preventDefault();setDragging(true);}} onKeyDown={e=>{if(e.key==='ArrowLeft'){e.preventDefault();setPanelWidth(v=>Math.min(1200,v+30));}if(e.key==='ArrowRight'){e.preventDefault();setPanelWidth(v=>Math.max(400,v-30));}}} title="拖曳調整寬度；方向鍵也可以調整"><GripVertical size={18}/></div>
     <aside className="monitor-column"><div className="monitor-head"><div><h3>其他直播</h3><span>LIVE MONITOR GRID</span></div><span className="monitor-count">{others.length} 台</span></div>{others.length===0?<div className="monitor-empty"><Play size={26}/><p>其他頻道將出現在這裡</p><small>點擊任一頻道可切換至主畫面</small></div>:<div className="monitor-list">{displayed.map((s,i)=><div className="monitor-card" key={s.key}>{liveMonitors?<div className="monitor-live"><iframe title={`${s.label} 監看直播`} src={streamSrc(s,true)} allow="autoplay; encrypted-media; fullscreen; picture-in-picture" allowFullScreen referrerPolicy="strict-origin-when-cross-origin"/></div>:<button className={'monitor-preview '+s.platform} onClick={()=>apply({...active,main:s.key})} title={`將 ${s.label} 設為主畫面`}><span className="preview-number">{String(i+2).padStart(2,'0')}</span><div className="preview-play"><Play size={23} fill="currentColor"/></div><span className="preview-caption">點擊切換主畫面</span></button>}<div className="monitor-meta"><div><span className={'mini-platform '+s.platform}>{s.platform==='twitch'?'T':'▶'}</span><strong title={s.label}>{s.label}</strong></div><div className="monitor-actions"><button title="切換到主畫面" onClick={()=>apply({...active,main:s.key})}><MonitorPlay size={14}/></button><button title="檢視聊天室" onClick={()=>{apply({...active,chat:s.key});setShowChat(true);}}><MessageSquare size={14}/></button><button title="移除頻道" onClick={()=>remove(s.key)}><X size={14}/></button></div></div></div>)}{others.length>limit-1&&<button className="show-more" onClick={()=>setShowAll(v=>!v)}>{showAll?<ChevronUp size={16}/>:<ChevronDown size={16}/>} {showAll?'收起其他頻道':`顯示其餘 ${others.length-displayed.length} 台`}</button>}</div>}<div className="monitor-note"><AlertCircle size={15}/><p>可啟用多台同步播放，啟用後監看區使用真正的嵌入播放器，預設靜音；Twitch 需至少 400 × 300 尺寸。大量同時播放可能耗用大量網路與硬體資源。</p></div></aside>
    </section>
-   <footer>MultiStream Hub <span>·</span> V1.1.2 <span>·</span> Made for the moments worth watching.</footer>
+   <footer>MultiStream Hub <span>·</span> V1.1.3 <span>·</span> Made for the moments worth watching.</footer>
   </main>
   {shareOpen&&<div className="overlay" onMouseDown={e=>{if(e.target===e.currentTarget)setShareOpen(false);}}><div className="modal"><div className="modal-head"><div><p className="eyebrow">SHARE YOUR VIEW</p><h2>分享觀看組合</h2></div><button className="icon-button" onClick={()=>setShareOpen(false)}><X size={19}/></button></div><p className="modal-description">包含 {active.streams.length} 台頻道、主畫面與聊天室選擇。朋友可直接開啟，不需登入。</p><label className="field-label">專屬網址</label><textarea readOnly rows={3} value={shareUrl} onFocus={e=>e.currentTarget.select()}/><button className="btn primary wide" onClick={copyShare}><Copy size={17}/> 複製分享網址</button><div className="info-note">此網址包含觀看組合資訊，任何取得連結的人都可以查看。分享網址可能較長；目前沒有短網址服務。</div></div></div>}
   {(incoming||importError)&&<div className="overlay"><div className="modal"><div className="modal-head"><div><p className="eyebrow">SHARED COLLECTION</p><h2>{importError?'分享連結有問題':'收到一份直播組合'}</h2></div></div>{importError?<><p className="modal-description">{importError}</p><button className="btn primary wide" onClick={()=>{setImportError('');clearHash();}}>返回我的控制台</button></>:<><p className="modal-description">包含 <b>{incoming!.streams.length}</b> 台直播。請選擇如何開啟（預設建議暫時開啟）。</p><div className="import-options"><button className="import-option recommended" onClick={()=>importChoice('temporary')}><span><strong>暫時開啟 <em>推薦</em></strong><small>立即觀看，不修改你儲存的清單</small></span><ArrowUpRight size={20}/></button><button className="import-option" onClick={()=>importChoice('merge')}><span><strong>加入我的清單</strong><small>新增未存在的頻道，保留個人布局</small></span><Plus size={20}/></button><button className="import-option danger-option" onClick={()=>setReplaceConfirm(true)}><span><strong>取代目前清單</strong><small>覆蓋本機原本的頻道與布局</small></span><Trash2 size={18}/></button></div><button className="ghost dismiss" onClick={()=>{setIncoming(null);clearHash();}}>取消，保留我的清單</button>{replaceConfirm&&<div className="confirm-box"><p>確定取代嗎？你的 {personal.streams.length} 台已儲存頻道會被這份 {incoming!.streams.length} 台的組合覆蓋。此操作無法自動復原。</p><div><button className="ghost" onClick={()=>setReplaceConfirm(false)}>返回</button><button className="btn danger" onClick={()=>importChoice('replace')}>確認取代</button></div></div>}</>}</div></div>}
-  {settings&&<div className="overlay" onMouseDown={e=>{if(e.target===e.currentTarget)setSettings(false);}}><div className="modal"><div className="modal-head"><div><p className="eyebrow">PREFERENCES</p><h2>顯示設定</h2></div><button className="icon-button" onClick={()=>setSettings(false)}><X size={18}/></button></div><label className="field-label" htmlFor="limit">監看區預設顯示數量</label><select id="limit" value={limit} onChange={e=>{setLimit(Number(e.target.value));setShowAll(false);}}><option value={5}>5 台（主畫面 + 4 張卡片）</option><option value={9}>9 台（主畫面 + 8 張卡片）</option><option value={17}>17 台（主畫面 + 16 張卡片）</option></select><label className="field-label" htmlFor="youtube-chat-theme">YouTube 聊天室主題</label><select id="youtube-chat-theme" value={youtubeChatTheme} onChange={e=>setYoutubeChatTheme(e.target.value as 'dark'|'light')}><option value="dark">深色（預設）</option><option value="light">淺色</option></select><div className="info-note">YouTube 的聊天室是跨網域 iframe，無法由本站 CSS 直接改色；主題選項會嘗試透過嵌入參數切換，並不保證 YouTube 一定套用。</div><div className="version-info"><Info size={16}/><span>目前版本 <strong>V1.1.2</strong> · <a href="https://github.com/joy510163/myMultistream" target="_blank" rel="noreferrer">GitHub 專案</a> · <a href="https://github.com/joy510163/myMultistream/blob/main/CHANGELOG.md" target="_blank" rel="noreferrer">更新紀錄</a></span></div><div className="info-note">開啟「多台同步播放」後，監看卡片會變成真正的影片播放器；監看區可拖曳調整寬度。聊天室嵌入可能受平台設定與瀏覽器限制。</div><button className="btn primary wide" onClick={()=>setSettings(false)}>完成</button></div></div>}
+  {settings&&<div className="overlay" onMouseDown={e=>{if(e.target===e.currentTarget)setSettings(false);}}><div className="modal"><div className="modal-head"><div><p className="eyebrow">PREFERENCES</p><h2>顯示設定</h2></div><button className="icon-button" onClick={()=>setSettings(false)}><X size={18}/></button></div><label className="field-label" htmlFor="limit">監看區預設顯示數量</label><select id="limit" value={limit} onChange={e=>{setLimit(Number(e.target.value));setShowAll(false);}}><option value={5}>5 台（主畫面 + 4 張卡片）</option><option value={9}>9 台（主畫面 + 8 張卡片）</option><option value={17}>17 台（主畫面 + 16 張卡片）</option></select><label className="field-label" htmlFor="youtube-chat-theme">YouTube 聊天室主題</label><select id="youtube-chat-theme" value={youtubeChatTheme} onChange={e=>setYoutubeChatTheme(e.target.value as 'dark'|'light')}><option value="dark">深色（預設）</option><option value="light">淺色</option></select><div className="info-note">YouTube 的聊天室是跨網域 iframe，無法由本站 CSS 直接改色；主題選項會嘗試透過嵌入參數切換，並不保證 YouTube 一定套用。</div><div className="version-info"><Info size={16}/><span>目前版本 <strong>V1.1.3</strong> · <a href="https://github.com/joy510163/myMultistream" target="_blank" rel="noreferrer">GitHub 專案</a> · <a href="https://github.com/joy510163/myMultistream/blob/main/CHANGELOG.md" target="_blank" rel="noreferrer">更新紀錄</a></span></div><div className="info-note">開啟「多台同步播放」後，監看卡片會變成真正的影片播放器；監看區可拖曳調整寬度。聊天室嵌入可能受平台設定與瀏覽器限制。</div><button className="btn primary wide" onClick={()=>setSettings(false)}>完成</button></div></div>}
  </div>;
 }
 createRoot(document.getElementById('root')!).render(<React.StrictMode><App/></React.StrictMode>);
