@@ -47,6 +47,8 @@
 }
 .notice-slot.is-visible{animation:msh-notice-enter 520ms cubic-bezier(.22,1,.36,1) both}
 .notice-slot.is-leaving{pointer-events:none;animation:msh-notice-exit 400ms ease-in both}
+/* A new message received during exit reuses the same toast without a second entrance. */
+.notice-slot.is-visible.is-resuming{animation:none}
 .notice-slot>.alert{margin:0;padding:11px 13px;display:flex;align-items:center;gap:10px;min-width:0}
 .notice-slot .alert span{min-width:0;flex:1}
 .notice-slot .alert button,.notice-slot .alert>svg{flex-shrink:0}
