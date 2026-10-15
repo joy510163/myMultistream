@@ -1,3 +1,5 @@
+> V1.1.3 hotfix：修正通知進場狀態與退場狀態混用；進場動畫於通知掛載時開始，保留 5 秒倒數及暫停。
+
 # 更新紀錄（Changelog）
 
 依新到舊排序。版本號與 `package.json` 保持一致。
@@ -68,3 +70,9 @@
 - LocalStorage 觀看清單保存。
 - Hash 分享與暫時開啟／合併／確認取代。
 - GitHub Pages 部署工作流程。
+
+
+### V1.1.3 hotfix — update visible notifications in place
+- Keep the same mounted toast when a new message arrives during its visible phase.
+- Replace text, kind and icon without replaying the entrance animation.
+- Restart the five-second countdown and progress bar separately.
