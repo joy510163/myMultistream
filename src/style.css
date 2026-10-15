@@ -29,31 +29,44 @@
 .chat-picker>button:not(.chat-theme-toggle){min-width:0;max-width:260px;overflow:hidden;text-overflow:ellipsis}
 .chat-menu{top:calc(100% + 7px);right:0}
 @media(max-width:600px){.chat-header{gap:10px;flex-wrap:wrap}.chat-picker{max-width:100%;margin-left:auto}.chat-picker>button:not(.chat-theme-toggle){max-width:190px}}
-/* Animate the actual layout height so following sections glide naturally. */
-.notice-slot{display:grid;grid-template-rows:0fr;opacity:0;transform:translateY(-9px);transition:grid-template-rows .4s ease,opacity .28s ease,transform .4s ease,margin .4s ease;margin-top:0;pointer-events:none}
-.notice-slot.is-visible{grid-template-rows:1fr;opacity:1;transform:translateY(0);margin-top:13px;pointer-events:auto}
-.notice-slot>.alert{min-height:0;overflow:hidden;margin:0;padding:0 13px;border-radius:9px;transition:padding .4s ease}
-.notice-slot.is-visible>.alert{padding:10px 13px}
-.notice-slot .alert span{min-width:0;flex:1}
-.notice-slot .alert button{flex-shrink:0}
-@media(prefers-reduced-motion:reduce){.notice-slot,.notice-slot>.alert{transition:none;transform:none}}
 /* Keep the selector above the cross-origin chat iframe. */
 .chat-box{overflow:visible}
 .chat-header{position:relative;z-index:3;border-radius:13px 13px 0 0}
 .chat-content{position:relative;z-index:1}
 .chat-menu{z-index:5}
 
-/* V1.1.3: consistent animated notices for all outcomes */
+/* Unified notification animation: one authoritative rule set. */
 .alert.warning{color:#ffe0a3;background:#59451c77}
 .alert.info{color:#c4dbff;background:#24446d66}
-.notice-slot{position:relative;border-radius:9px;overflow:hidden}
-.notice-slot>.alert{margin:0}
+.notice-slot{
+  display:block;position:relative;box-sizing:border-box;
+  max-height:200px;overflow:hidden;opacity:1;margin-top:13px;
+  transform:translateY(0);border-radius:9px;
+  pointer-events:auto;
+  animation:msh-notice-enter 520ms cubic-bezier(.22,1,.36,1) both;
+}
+.notice-slot.is-visible{animation:msh-notice-enter 520ms cubic-bezier(.22,1,.36,1) both}
+.notice-slot.is-leaving{pointer-events:none;animation:msh-notice-exit 400ms ease-in both}
+.notice-slot>.alert{margin:0;padding:11px 13px;display:flex;align-items:center;gap:10px;min-width:0}
+.notice-slot .alert span{min-width:0;flex:1}
+.notice-slot .alert button,.notice-slot .alert>svg{flex-shrink:0}
 .notice-slot .notice-progress{position:absolute;left:0;bottom:0;height:2px;width:100%;background:currentColor;opacity:.5;transform-origin:left center;animation:notice-countdown 5s linear both}
 .notice-slot:has(.alert.success){color:#a8f5c3}
 .notice-slot:has(.alert.error){color:#ffc4cf}
 .notice-slot:has(.alert.warning){color:#ffe0a3}
 .notice-slot:has(.alert.info){color:#c4dbff}
 .notice-slot.is-paused .notice-progress{animation-play-state:paused}
-.notice-slot .alert>svg{flex-shrink:0}
+@keyframes msh-notice-enter{
+  0%{max-height:0;margin-top:0;opacity:0;transform:translateY(-12px)}
+  100%{max-height:200px;margin-top:13px;opacity:1;transform:translateY(0)}
+}
+@keyframes msh-notice-exit{
+  0%{max-height:200px;margin-top:13px;opacity:1;transform:translateY(0)}
+  100%{max-height:0;margin-top:0;opacity:0;transform:translateY(-12px)}
+}
 @keyframes notice-countdown{from{transform:scaleX(1)}to{transform:scaleX(0)}}
-@media(prefers-reduced-motion:reduce){.notice-slot .notice-progress{animation:none;display:none}}
+@media(prefers-reduced-motion:reduce){
+  .notice-slot.is-visible,.notice-slot.is-leaving{animation:none}
+  .notice-slot.is-leaving{display:none;margin:0}
+  .notice-slot .notice-progress{display:none}
+}
