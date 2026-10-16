@@ -72,3 +72,25 @@
   .notice-slot.is-leaving{display:none;margin:0}
   .notice-slot .notice-progress{display:none}
 }
+
+/* V1.2: named collections */
+.collection-top-btn{white-space:nowrap}
+.collection-modal{width:min(760px,calc(100vw - 32px));max-height:85vh;overflow:auto}
+.collection-create{display:flex;gap:10px;margin:16px 0 8px}
+.collection-create input{min-width:0;flex:1;background:#151929;color:#f4f1ff;border:1px solid #45405f;border-radius:9px;padding:12px;font:inherit}
+.collection-create input:focus{outline:2px solid #8f70e4;outline-offset:1px}
+.collection-create .btn{flex-shrink:0;white-space:nowrap}
+.collection-count{font-size:12px;color:#aeb2c7;margin:10px 0}
+.collection-list{display:grid;gap:10px;max-height:40vh;overflow:auto;padding:2px}
+.collection-card{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:13px;background:#1e2232;border:1px solid #3d4155;border-radius:11px}
+.collection-info{display:flex;flex-direction:column;min-width:0;gap:4px}
+.collection-info strong{color:#f4f0ff;overflow-wrap:anywhere}
+.collection-info small{color:#aeb2c7}
+.collection-active{font-size:11px;color:#c9b4ff}
+.collection-actions{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end}
+.collection-actions button{display:inline-flex;gap:5px;align-items:center;justify-content:center;border-radius:7px;padding:7px 9px;background:#30324a;border:1px solid #4a4865;color:#e9e2ff;cursor:pointer;font:inherit;font-size:12px}
+.collection-actions button:hover{background:#494063}
+.collection-actions button.collection-delete-confirm{background:#6d293a;color:white}
+.collection-empty{text-align:center;color:#bdb8d1;padding:28px 12px;background:#1c2030;border-radius:10px}
+.collection-empty svg{margin:auto}.collection-empty p{margin:8px 0}.collection-empty small{font-size:12px}
+@media(max-width:680px){.collection-create{flex-direction:column}.collection-card{align-items:stretch;flex-direction:column}.collection-actions{justify-content:flex-start}.collection-top-btn{font-size:0}.collection-top-btn svg{font-size:initial}}
