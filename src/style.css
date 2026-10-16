@@ -176,3 +176,18 @@
 .reserve-image{width:100%;aspect-ratio:16/9;border:0;background:linear-gradient(140deg,#323d58,#202639);color:#bfcdf0;border-radius:5px;display:grid;place-items:center}
 .reserve-empty{color:#9ba7bf;font-size:12px;padding:12px}
 @media(max-width:700px){.esports-stages.esports-multi{display:grid;grid-template-columns:minmax(400px,1fr) minmax(500px,1.42fr) minmax(400px,1fr)}.esports-stages.esports-multi .esports-stage{width:auto}}
+
+/* V1.4.3 esports interactions */
+.esports-stages.esports-multi{grid-template-columns:minmax(400px,1fr) minmax(480px,var(--esports-center,620px)) minmax(400px,1fr);min-width:max-content}
+.esports-stages.esports-multi>.esports-team{min-width:400px}
+.esports-stages.esports-multi>.esports-official{min-width:480px}
+.esports-tools{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.esports-width-label,.esports-audio-shortcut{display:flex;align-items:center;gap:7px;font-size:12px;color:#e2d9fa}
+.esports-width-label input{width:125px;accent-color:#aa92ed}
+.esports-audio-shortcut select{background:#222538;border:1px solid #53516f;border-radius:6px;color:#eee;padding:7px;max-width:200px}
+.esports-drop-active{outline:2px dashed #c5a5ff;outline-offset:-3px;background-color:#303050!important}
+.esports-team-player[draggable],.reserve-item[draggable]{cursor:grab}
+.esports-team-player[draggable]:active,.reserve-item[draggable]:active{cursor:grabbing}
+.esports-team-meta strong{display:flex;align-items:center;gap:4px}
+.esports-stage-head button{display:inline-flex;align-items:center;gap:5px}
+@media(max-width:700px){.esports-tools{width:100%}.esports-width-label input{width:100px}}
