@@ -1,3 +1,7 @@
+## V1.4.3 更新
+
+上傳 `src/main.tsx`、`src/style.css` 到 GitHub 的 `src/`，以及根目錄 `package.json`、`index.html`、`README.md`、`CHANGELOG.md`、`UPDATE_GUIDE.md`。其餘文件保持不變。
+
 # V1.4.2 GitHub 更新指引
 
 請先備份目前個人組合，並使用一般 GitHub 網站 **Add file → Upload files**（無須 github.dev）：
