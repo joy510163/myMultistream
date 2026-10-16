@@ -1,5 +1,6 @@
 export type Stream = { key:string; platform:'twitch'|'youtube'; id:string; label:string };
-export type Layout = { version:1; streams:Stream[]; main:string|null; chat:string|null };
+export type EsportsRoles = { official:string|null; left:string|null; right:string|null };
+export type Layout = { version:1; streams:Stream[]; main:string|null; chat:string|null; viewMode?:'focus'|'esports'; esports?:EsportsRoles };
 export const EMPTY: Layout = {version:1,streams:[],main:null,chat:null};
 const twitchName = /^[a-zA-Z0-9_]{3,25}$/;
 const youtubeId = /^[a-zA-Z0-9_-]{11}$/;
@@ -38,7 +39,12 @@ export function validateLayout(v:unknown):Layout {
   const keys=new Set(streams.map(s=>s.key));
   const main=typeof obj.main==='string'&&keys.has(obj.main)?obj.main:streams[0]?.key??null;
   const chat=typeof obj.chat==='string'&&keys.has(obj.chat)?obj.chat:main;
-  return {version:1,streams,main,chat};
+  const rawRoles=obj.esports && typeof obj.esports==='object'?obj.esports as Record<string,unknown>:{};
+  const role=(name:string)=>typeof rawRoles[name]==='string' && keys.has(rawRoles[name] as string)?rawRoles[name] as string:null;
+  const roles={official:role('official'),left:role('left'),right:role('right')};
+  const distinct=new Set([roles.official,roles.left,roles.right].filter(Boolean));
+  if(distinct.size!==[roles.official,roles.left,roles.right].filter(Boolean).length)throw Error('賽事角色不能重複指定頻道');
+  return {version:1,streams,main,chat,viewMode:obj.viewMode==='esports'?'esports':'focus',esports:roles};
 }
 export function encodeLayout(layout:Layout):string {
   const bytes=new TextEncoder().encode(JSON.stringify(layout));
