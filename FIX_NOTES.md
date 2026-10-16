@@ -1,9 +1,6 @@
-# V1.4.1 verification notes
+# V1.4.2 檢查記錄
 
-- Built against the supplied V1.4.0 source snapshot.
-- TypeScript transpilation of all src TS/TSX files passed without syntax diagnostics.
-- npm install / npm run build could not complete: registry.npmjs.org returned EAI_AGAIN.
-- Full application/browser validation and GitHub Pages deployment remain pending.
-- V1 share links remain schema version 1; optional viewMode and esports fields are validated against stream keys.
-- On narrow displays esports stages stack (official on top, teams below) for 16:9 aspect ratio.
-- Twitch embed min player size should be checked on target screens.
+- 已由完整 V1.4.1 專案 ZIP 修改，不另建網站。
+- TypeScript TSX 轉換語法檢查通過。
+- `npm install --offline` 失敗：套件快取不完整，缺少 @types/react；無法宣稱完整 `npm run build` 已通過。
+- 待 GitHub Actions 與瀏覽器實際驗收：Twitch 最小播放器尺寸、瀏覽器音訊政策、多人分組與分享資料往返。

@@ -1,10 +1,17 @@
-## V1.4.1 — Esports layout (2026-10-16)
+## V1.4.2 — 電競賽事多視角（2026-10-16）
 
-- Added genuine official broadcast + left team + right team layout and role swapping.
-- Removed duplicated dual / quad width presets.
-- Persisted esports roles and view mode in local configurations, named collections, JSON backup and hash links.
-- Preserved previous v1 share-link compatibility.
-- Included responsive 16:9 player presentation and existing controls.
+### Added
+- 官方主控台固定中央；左右各可加入多台隊伍直播，保留 16:9 比例並在必要時水平捲動。
+- 隊伍名稱編輯、雙方成員交換、隊內順序微調、移回候補。
+- 候補區切換精簡列表／靜態迷你預覽，不額外產生播放器。
+- 隊伍直播採用監看播放器數量上限，降低同時載入的 iframe 數量。
+
+### Compatibility
+- 保留 `version:1` Hash、LocalStorage、具名組合和 JSON 備份結構。
+- 既有單一 left/right 賽事角色自動轉換為新隊伍陣列。
+- 一大多小、聊天室、通知、音訊切換及放大功能沿用。
+
+---
 
 ## V1.4.0 — 2026-10-16
 
