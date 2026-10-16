@@ -1,3 +1,11 @@
+## V1.4.1 — Esports layout (2026-10-16)
+
+- Added genuine official broadcast + left team + right team layout and role swapping.
+- Removed duplicated dual / quad width presets.
+- Persisted esports roles and view mode in local configurations, named collections, JSON backup and hash links.
+- Preserved previous v1 share-link compatibility.
+- Included responsive 16:9 player presentation and existing controls.
+
 ## V1.4.0 — 2026-10-16
 
 ### Added
