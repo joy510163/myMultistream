@@ -1,5 +1,5 @@
 export type Stream = { key:string; platform:'twitch'|'youtube'; id:string; label:string };
-export type EsportsRoles = { official:string|null; left:string|null; right:string|null };
+export type EsportsRoles = { official:string|null; left:string|null; right:string|null; teamA?:string[]; teamB?:string[]; teamAName?:string; teamBName?:string };
 export type Layout = { version:1; streams:Stream[]; main:string|null; chat:string|null; viewMode?:'focus'|'esports'; esports?:EsportsRoles };
 export const EMPTY: Layout = {version:1,streams:[],main:null,chat:null};
 const twitchName = /^[a-zA-Z0-9_]{3,25}$/;
@@ -41,9 +41,19 @@ export function validateLayout(v:unknown):Layout {
   const chat=typeof obj.chat==='string'&&keys.has(obj.chat)?obj.chat:main;
   const rawRoles=obj.esports && typeof obj.esports==='object'?obj.esports as Record<string,unknown>:{};
   const role=(name:string)=>typeof rawRoles[name]==='string' && keys.has(rawRoles[name] as string)?rawRoles[name] as string:null;
-  const roles={official:role('official'),left:role('left'),right:role('right')};
-  const distinct=new Set([roles.official,roles.left,roles.right].filter(Boolean));
-  if(distinct.size!==[roles.official,roles.left,roles.right].filter(Boolean).length)throw Error('賽事角色不能重複指定頻道');
+  // Old V1.4.1 single-player roles are upgraded on read without changing the URL version.
+  const validTeam=(field:string,fallback:string|null)=>{
+    const value=rawRoles[field];
+    if(!Array.isArray(value))return fallback?[fallback]:[];
+    if(value.length>64||value.some(key=>typeof key!=='string'||!keys.has(key)))throw Error('賽事隊伍包含無效頻道');
+    return [...new Set(value as string[])];
+  };
+  const official=role('official');
+  const teamA=validTeam('teamA',role('left'));
+  const teamB=validTeam('teamB',role('right'));
+  if(new Set([official,...teamA,...teamB].filter(Boolean)).size!==Number(Boolean(official))+teamA.length+teamB.length)throw Error('同一頻道不能重複分配賽事角色');
+  const cleanName=(name:unknown,fallback:string)=>typeof name==='string'&&name.trim().length>0&&name.trim().length<=32?name.trim():fallback;
+  const roles:EsportsRoles={official,left:teamA[0]??null,right:teamB[0]??null,teamA,teamB,teamAName:cleanName(rawRoles.teamAName,'隊伍 A'),teamBName:cleanName(rawRoles.teamBName,'隊伍 B')};
   return {version:1,streams,main,chat,viewMode:obj.viewMode==='esports'?'esports':'focus',esports:roles};
 }
 export function encodeLayout(layout:Layout):string {

@@ -150,3 +150,29 @@
 .esports-hint{color:#9ca6c0;font-size:11px;line-height:1.7;margin:12px 2px 0}
 @media(max-width:1650px){.esports-stages{grid-template-columns:repeat(2,minmax(0,1fr))}.esports-official{grid-column:1/-1;grid-row:1}.esports-left{grid-column:1;grid-row:2}.esports-right{grid-column:2;grid-row:2}}
 @media(max-width:700px){.esports-stages{display:flex;flex-direction:column}.esports-stage{width:100%}.esports-heading{align-items:start}}
+
+/* V1.4.2: independent esports viewing and compact unassigned channels */
+.layout-esports .monitor-column{display:none}
+.esports-scroll{overflow-x:auto;padding-bottom:6px;scrollbar-color:#494158 #151927}
+.esports-stages.esports-multi{min-width:1320px;grid-template-columns:minmax(400px,1fr) minmax(500px,1.42fr) minmax(400px,1fr);align-items:start}
+.esports-team .esports-stage-head input{min-width:0;width:65%;border:1px solid transparent;background:transparent;color:#e8e9fa;font-size:14px;font-weight:700;padding:5px}
+.esports-team .esports-stage-head input:focus{border-color:#8c71d6;outline:0}
+.esports-team .esports-stage-head small{color:#9ca9c4}
+.esports-team-list{display:grid;gap:12px;max-height:850px;overflow-y:auto;padding-right:3px}
+.esports-team-player{border:1px solid #40495d;border-radius:8px;padding:6px;background:#191e2e}
+.esports-team-meta{display:flex;align-items:center;justify-content:space-between;gap:5px;margin:1px 0 7px}
+.esports-team-meta strong{font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.esports-team-meta>div{display:flex;gap:2px;flex-shrink:0}
+.esports-team-meta button{background:#32374b;color:#d5dbed;border:0;border-radius:4px;padding:5px;display:grid;place-items:center}
+.team-load-placeholder{background:#242b3b;border:0;color:#c3cbe0;width:100%;height:100%;display:grid;place-content:center;justify-items:center;gap:8px;font-size:11px}
+.team-empty{min-height:90px}
+.esports-reserves{margin-top:16px;border:1px solid #343d50;border-radius:10px;padding:13px;background:#1d2331}
+.reserve-heading{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:9px;margin-bottom:12px;color:#e0e5f0;font-size:12px}
+.reserve-toggle{display:flex;gap:5px}.reserve-toggle button{background:#2a3143;color:#acb7ce;border:1px solid #454b5e;border-radius:6px;padding:6px 10px;font-size:11px}.reserve-toggle button.selected{background:#534275;color:#fff;border-color:#8266b6}
+.reserve-list{display:grid;gap:9px}.reserve-compact{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}.reserve-previews{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}
+.reserve-item{min-width:0;border:1px solid #3a4156;border-radius:8px;padding:8px;background:#252d3e;display:flex;flex-direction:column;gap:7px}
+.reserve-label{display:flex;gap:7px;align-items:center;min-width:0}.reserve-label strong{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.reserve-item select{width:100%;min-width:0;padding:7px;background:#161c29;color:#dee5f2;border:1px solid #4a5269;border-radius:6px;font-size:11px}
+.reserve-image{width:100%;aspect-ratio:16/9;border:0;background:linear-gradient(140deg,#323d58,#202639);color:#bfcdf0;border-radius:5px;display:grid;place-items:center}
+.reserve-empty{color:#9ba7bf;font-size:12px;padding:12px}
+@media(max-width:700px){.esports-stages.esports-multi{display:grid;grid-template-columns:minmax(400px,1fr) minmax(500px,1.42fr) minmax(400px,1fr)}.esports-stages.esports-multi .esports-stage{width:auto}}
