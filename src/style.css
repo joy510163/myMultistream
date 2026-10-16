@@ -109,3 +109,21 @@
 .focus-mode .section-title .section-kicker{display:none;}
 .focus-mode .view-grid{min-height:calc(100vh - 120px);}
 @media(max-width:700px){.backup-actions{flex-direction:column;}}
+
+/* V1.4: layout presets, independent sound selection, zoom */
+.audio-select,.layout-select{display:inline-flex;align-items:center;gap:6px;color:#bba8ec;border:1px solid #45405f;border-radius:9px;padding:7px 8px;background:#202437}
+.audio-select select,.layout-select select{max-width:165px;min-width:0;background:transparent;color:#f3edff;border:0;font:inherit;font-size:12px;cursor:pointer}
+.audio-select option,.layout-select option{background:#202437;color:#fff}
+.view-grid.layout-dual,.view-grid.with-live-monitors.layout-dual{grid-template-columns:minmax(0,1fr) 8px minmax(0,1fr)}
+.view-grid.layout-quad,.view-grid.with-live-monitors.layout-quad{grid-template-columns:minmax(0,1fr) 8px minmax(0,1fr)}
+.view-grid.layout-dual .monitor-list{grid-template-columns:repeat(1,minmax(0,1fr))}
+.view-grid.layout-quad .monitor-list{grid-template-columns:repeat(2,minmax(0,1fr))}
+.view-grid.layout-dual .resize-handle,.view-grid.layout-quad .resize-handle{pointer-events:none;opacity:.2}
+.zoom-overlay{position:fixed;inset:0;z-index:10000;background:rgba(4,6,13,.94);display:grid;place-items:center;padding:20px}
+.zoom-frame{width:min(96vw,1600px);display:flex;flex-direction:column;gap:10px}
+.zoom-toolbar{display:flex;justify-content:space-between;align-items:center;color:#fff;gap:12px}
+.zoom-frame iframe{width:100%;aspect-ratio:16/9;border:0;background:#000;max-height:78vh}
+.zoom-frame small{color:#aeb5ca}
+@media(max-width:920px){.view-grid.layout-dual,.view-grid.layout-quad{display:block}.audio-select select{max-width:110px}}
+
+@media(max-width:1180px){.view-grid.layout-dual,.view-grid.layout-quad,.view-grid.with-live-monitors.layout-dual,.view-grid.with-live-monitors.layout-quad{display:block}.view-grid.layout-dual .monitor-list,.view-grid.layout-quad .monitor-list{grid-template-columns:repeat(auto-fit,minmax(min(100%,400px),1fr))}}
